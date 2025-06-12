@@ -1,0 +1,96 @@
+Classe Main projeto Atualizado
+
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("==========================================");
+        System.out.println("        BEM-VINDO À BATALHA NAVAL!        ");
+        System.out.println("==========================================");
+        System.out.println("\nPrepare-se para uma emocionante batalha nos mares!");
+
+        System.out.println("\n--- Como Jogar ---");
+        System.out.println("1. Você estará em um tabuleiro de 5x5, representado por linhas (0-4) e colunas (A-E).");
+        System.out.println("2. O computador posicionou navios secretos neste tabuleiro.");
+        System.out.println("3. Seu objetivo é AFUNDAR TODOS os navios do computador!");
+        System.out.println("4. Para atirar, você deve informar a coordenada, por exemplo: A0, B2, C4.");
+        System.out.println("   - 'A' representa a primeira coluna, 'B' a segunda, e assim por diante.");
+        System.out.println("   - '0' representa a primeira linha, '1' a segunda, e assim por diante.");
+        System.out.println("5. Símbolos no tabuleiro:");
+        System.out.println("   - '~': Água (local não atingido).");
+        System.out.println("   - 'O': Água (você errou o tiro).");
+        System.out.println("   - 'X': Acerto (você atingiu uma parte de um navio!).");
+        System.out.println("   - Quando um navio é atingido em todas as suas partes, ele afunda!");
+        System.out.println("\nQue a batalha comece!");
+
+        System.out.print("Pressione Enter para começar...");
+        scanner.nextLine();
+
+        System.out.println("\nCriando o tabuleiro...");
+        Tabuleiro meuTabuleiro = new Tabuleiro(5);
+        System.out.println("Tabuleiro inicializado com sucesso!\n");
+
+        System.out.println("Criando navios inimigos...");
+        Navio submarino = new Navio("Submarino", 3);
+        Navio destroyer = new Navio("Destroyer", 2);
+        Navio patrulha1 = new Navio("Navio Patrulha 1", 1);
+        Navio patrulha2 = new Navio("Navio Patrulha 2", 1);
+
+        System.out.println("Navios inimigos criados: " + submarino.getNome() + ", "
+                               + destroyer.getNome() + ", "
+                               + patrulha1.getNome() + ", "
+                               + patrulha2.getNome() + "\n");
+
+        System.out.println("Posicionando navios inimigos aleatoriamente...\n");
+
+        meuTabuleiro.posicionarNavioAleatoriamente(submarino);
+        meuTabuleiro.posicionarNavioAleatoriamente(destroyer);
+        meuTabuleiro.posicionarNavioAleatoriamente(patrulha1);
+        meuTabuleiro.posicionarNavioAleatoriamente(patrulha2);
+
+        boolean jogoEmAndamento = true;
+        while (jogoEmAndamento) {
+            meuTabuleiro.exibirTabuleiroJogador();
+
+            System.out.println("Onde você quer atirar? (Ex: A0, B2)");
+            System.out.print("Sua jogada: ");
+            String entrada = scanner.nextLine().toUpperCase();
+
+            if (entrada.length() != 2) {
+                System.out.println("Entrada inválida. Por favor, use o formato 'ColunaLinha' (Ex: A0).");
+                continue;
+            }
+
+            char colunaChar = entrada.charAt(0);
+            int coluna = colunaChar - 'A';
+
+            int linha;
+            try {
+                linha = Integer.parseInt(entrada.substring(1));
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida para a linha. Por favor, use o formato 'ColunaLinha' (Ex: A0).");
+                continue;
+            }
+
+            if (linha < 0 || linha >= meuTabuleiro.getTamanho() || coluna < 0 || coluna >= meuTabuleiro.getTamanho()) {
+                System.out.println("Coordenadas fora do tabuleiro. Tente novamente.");
+                continue;
+            }
+
+            jogoEmAndamento = meuTabuleiro.receberTiro(linha, coluna);
+        }
+
+        // Fim do jogo
+        System.out.println("\n====================================");
+        System.out.println("         PARABÉNS! VOCÊ VENCEU!     ");
+        System.out.println("     Todos os navios inimigos foram afundados!");
+        System.out.println("====================================");
+
+        meuTabuleiro.exibirTabuleiroDebug();
+        scanner.close();
+    }
+}
+
+
+
