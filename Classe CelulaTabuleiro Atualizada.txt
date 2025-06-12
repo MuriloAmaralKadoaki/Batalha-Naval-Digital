@@ -1,0 +1,35 @@
+Classe CelulaTabuleiro Atualizada
+
+public class CelulaTabuleiro {
+    private char estado; 
+    private Navio navio; 
+
+    public CelulaTabuleiro() {
+        this.estado = '~'; 
+        this.navio = null; 
+    }
+
+    public char getEstado() {
+        return estado;
+    }
+
+    public void setEstado(char estado) {
+        this.estado = estado;
+    }
+
+    public Navio getNavio() {
+        return navio;
+    }
+
+    public void setNavio(Navio navio) {
+        this.navio = navio;
+        this.estado = 'N'; 
+    }
+
+    public char getEstadoParaJogador() {
+        if (this.estado == 'N') {
+            return '~'; 
+        }
+        return this.estado;
+    }
+}

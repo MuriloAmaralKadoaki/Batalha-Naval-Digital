@@ -1,0 +1,41 @@
+Classe Navio Atualizada 
+
+public class Navio {
+    private int tamanho;
+    private int partesAtingidas; 
+    private String nome;        
+    private boolean afundado;  
+
+    public Navio(String nome, int tamanho) {
+        this.nome = nome;
+        this.tamanho = tamanho;
+        this.partesAtingidas = 0; 
+        this.afundado = false;    
+    }
+
+    public void acertarParte() {
+        if (partesAtingidas < tamanho) { 
+            partesAtingidas++;
+            if (partesAtingidas == tamanho) {
+                this.afundado = true; 
+                System.out.println(">>> VOCÊ AFUNDOU O " + this.nome.toUpperCase() + "!");
+            }
+        }
+    }
+
+    public boolean estaAfundado() {
+        return afundado; 
+    }
+
+    public int getTamanho() {
+        return tamanho;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public int getPartesAtingidas() {
+        return partesAtingidas;
+    }
+}

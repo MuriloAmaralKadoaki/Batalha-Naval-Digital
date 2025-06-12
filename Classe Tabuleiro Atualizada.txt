@@ -1,0 +1,161 @@
+Classe Tabuleiro Atualizada
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Tabuleiro {
+    private CelulaTabuleiro[][] grade;
+    private int tamanho;
+    private Random random;
+    private List<Navio> naviosNoTabuleiro;
+
+    public Tabuleiro(int tamanho) {
+        this.tamanho = tamanho;
+        this.grade = new CelulaTabuleiro[tamanho][tamanho];
+        this.random = new Random();
+        this.naviosNoTabuleiro = new ArrayList<>();
+        inicializarTabuleiro();
+    }
+
+    private void inicializarTabuleiro() {
+        for (int i = 0; i < tamanho; i++) {
+            for (int j = 0; j < tamanho; j++) {
+                this.grade[i][j] = new CelulaTabuleiro();
+            }
+        }
+    }
+
+    public void exibirTabuleiroDebug() { 
+        System.out.println("\n--- TABULEIRO DEBUG ---");
+        System.out.print("  ");
+        for (char c = 'A'; c < 'A' + tamanho; c++) {
+            System.out.print(c + " ");
+        }
+        System.out.println();
+
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(i + " ");
+            for (int j = 0; j < tamanho; j++) {
+                System.out.print(this.grade[i][j].getEstado() + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("---------------------\n");
+    }
+
+    public int getTamanho() {
+        return tamanho;
+    }
+
+    public boolean posicionarNavio(Navio navio, int linhaInicial, int colunaInicial, boolean isHorizontal) {
+        if (linhaInicial < 0 || linhaInicial >= tamanho ||
+            colunaInicial < 0 || colunaInicial >= tamanho) {
+            return false;
+        }
+
+        if (isHorizontal) {
+            if (colunaInicial + navio.getTamanho() > tamanho) {
+                return false;
+            }
+        } else {
+            if (linhaInicial + navio.getTamanho() > tamanho) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < navio.getTamanho(); i++) {
+            int linhaAtual = isHorizontal ? linhaInicial : linhaInicial + i;
+            int colunaAtual = isHorizontal ? colunaInicial + i : colunaInicial;
+
+            if (grade[linhaAtual][colunaAtual].getNavio() != null) {
+                return false; // Já existe um navio aqui
+            }
+        }
+
+        for (int i = 0; i < navio.getTamanho(); i++) {
+            int linhaAtual = isHorizontal ? linhaInicial : linhaInicial + i;
+            int colunaAtual = isHorizontal ? colunaInicial + i : colunaInicial;
+            grade[linhaAtual][colunaAtual].setNavio(navio); 
+        }
+        this.naviosNoTabuleiro.add(navio);
+        return true;
+    }
+
+    public void posicionarNavioAleatoriamente(Navio navio) {
+        boolean posicionado = false;
+        int tentativas = 0;
+        final int MAX_TENTATIVAS = 1000;
+
+        while (!posicionado && tentativas < MAX_TENTATIVAS) {
+            int linhaInicial = random.nextInt(tamanho);
+            int colunaInicial = random.nextInt(tamanho);
+            boolean isHorizontal = random.nextBoolean();
+
+            if (posicionarNavio(navio, linhaInicial, colunaInicial, isHorizontal)) {
+                posicionado = true;
+            }
+            tentativas++;
+        }
+        if (!posicionado) {
+            System.err.println("Erro: Não foi possível posicionar o navio " + navio.getNome() + " após " + MAX_TENTATIVAS + " tentativas. Tente um tabuleiro maior ou menos navios.");
+        }
+    }
+
+    public boolean receberTiro(int linha, int coluna) {
+        if (linha < 0 || linha >= tamanho || coluna < 0 || coluna >= tamanho) {
+            System.out.println("Tiro inválido! Coordenadas fora do tabuleiro. Tente novamente.");
+            return true; 
+        }
+
+        CelulaTabuleiro celulaAlvo = grade[linha][coluna];
+        char estadoAtual = celulaAlvo.getEstado();
+
+        if (estadoAtual == 'X' || estadoAtual == 'O') {
+            System.out.println("Você já atirou nesta posição! Tente novamente.");
+            return true; 
+        }
+
+        if (estadoAtual == '~') { 
+            System.out.println("Água! Tiro na posição " + (char)('A' + coluna) + "" + linha);
+            celulaAlvo.setEstado('O'); 
+        } else if (estadoAtual == 'N') { 
+            System.out.println("ACERTOU! Tiro na posição " + (char)('A' + coluna) + "" + linha);
+            celulaAlvo.setEstado('X'); 
+
+            Navio navioAtingido = celulaAlvo.getNavio(); 
+            if (navioAtingido != null) {
+                navioAtingido.acertarParte();
+            }
+        }
+        
+        return !todosNaviosInimigosAfundados();
+    }
+
+    public boolean todosNaviosInimigosAfundados() {
+        for (Navio navio : naviosNoTabuleiro) {
+            if (!navio.estaAfundado()) {
+                return false; 
+            }
+        }
+        return true; 
+    }
+
+    public void exibirTabuleiroJogador() {
+        System.out.println("\n--- SEU TABULEIRO DE ATAQUE ---");
+        System.out.print("  ");
+        for (char c = 'A'; c < 'A' + tamanho; c++) {
+            System.out.print(c + " ");
+        }
+        System.out.println();
+
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(i + " ");
+            for (int j = 0; j < tamanho; j++) {
+                System.out.print(this.grade[i][j].getEstadoParaJogador() + " "); 
+            }
+            System.out.println();
+        }
+        System.out.println("-----------------------------\n");
+    }
+}
